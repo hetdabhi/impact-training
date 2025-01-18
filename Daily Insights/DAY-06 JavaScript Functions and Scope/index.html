@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .task { display: flex; justify-content: space-between; margin: 10px 0; }
+    .completed { text-decoration: line-through; }
+  </style>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <input type="text" id="taskInput" placeholder="Enter a task" />
+  <button id="addTaskBtn">Add Task</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+    const renderTasks = () => {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = ''; // Clear current task list
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.className = 'task';
+        li.innerHTML = `
+          <span class="${task.completed ? 'completed' : ''}">${task.text}</span>
+          <button onclick="deleteTask(${index})">Delete</button>
+          <button onclick="toggleTask(${index})">${task.completed ? 'Undo' : 'Complete'}</button>
+        `;
+        taskList.appendChild(li);
+      });
+    };
+
+    const addTask = () => {
+      const taskInput = document.getElementById('taskInput');
+      const taskText = taskInput.value.trim();
+      if (taskText) {
+        tasks.push({ text: taskText, completed: false });
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        taskInput.value = '';
+        renderTasks();
+      }
+    };
+
+    const deleteTask = (index) => {
+      tasks.splice(index, 1);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      renderTasks();
+    };
+
+    const toggleTask = (index) => {
+      tasks[index].completed = !tasks[index].completed;
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      renderTasks();
+    };
+
+    document.getElementById('addTaskBtn').addEventListener('click', addTask);
+
+    renderTasks(); // Initial render
+  </script>
+</body>
+</html>
